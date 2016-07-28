@@ -2,7 +2,6 @@ package com.layabox.parser.as3;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import com.adobe.ac.pmd.parser.IAS3Parser;
 import com.adobe.ac.pmd.parser.IParserNode;
