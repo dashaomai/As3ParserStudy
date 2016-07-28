@@ -2,6 +2,7 @@ package com.layabox.parser.as3;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import com.adobe.ac.pmd.parser.IAS3Parser;
 import com.adobe.ac.pmd.parser.IParserNode;
@@ -13,20 +14,33 @@ import de.bokelberg.flex.parser.AS3Parser;
 public class TestAs3Parser {
 
 	public static void main(String[] args) {
-		TestAs3Parser test = new TestAs3Parser();
+		String filePath = null;
 		
-		try {
-			test.Parse("test/examples/JPEGEncoder.as");
-		} catch (Exception ex) {
-			System.err.println(ex);
+		if (args.length > 0) {
+			filePath = args[0];
+		} else {
+			try {
+				 filePath = ClassLoader.getSystemResource("test/examples/JPEGEncoder.as").toURI().getPath();
+			} catch (URISyntaxException ex) {
+				System.err.println(ex);
+				return;
+			}
 		}
+		
+		if (null != filePath) {
+			try {
+				TestAs3Parser.Parse(filePath);
+			} catch (Exception ex) {
+				System.err.println(ex);
+			}
+		}
+	
 	}
 
-    private void Parse(final String filePath) throws URISyntaxException, IOException, TokenException {
+    private static void Parse(final String filePath) throws URISyntaxException, IOException, TokenException {
         IAS3Parser parser = new AS3Parser();
 
-        String path = getClass().getResource(filePath).toURI().getPath();
-        IParserNode root = parser.buildAst(path);
+        IParserNode root = parser.buildAst(filePath);
         StringBuffer buffer = new StringBuffer();
 
         BeginVisit(buffer);
@@ -70,7 +84,7 @@ public class TestAs3Parser {
         buffer.append("\t");
         buffer.append("struct");
         buffer.append(myId);
-        buffer.append(" [shape=record, label=\"");
+        buffer.append(" [label=\"");
         buffer.append(ast.getId());
         buffer.append("(");
         buffer.append(level);
