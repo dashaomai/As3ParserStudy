@@ -11,17 +11,17 @@ public class TestAs3Analyser extends BaseAs3Analyser {
 	}
 
     private int currentStructId;
-    private Boolean inTheClass;
 
+    @Override
     public void BeginVisit(final StringBuffer buffer) {
         currentStructId = 0;
-        inTheClass = false;
 
         buffer.setLength(0);
         buffer.append("digraph structs {\n");
         buffer.append("\tnode [shape=record];\n");
     }
 
+    @Override
     public void EndVisit(final StringBuffer buffer) {
         buffer.append("}\n");
     }
@@ -38,52 +38,38 @@ public class TestAs3Analyser extends BaseAs3Analyser {
 
         currentStructId++;
 
-        final int myId = currentStructId;
+    final int myId = currentStructId;
 
-        final Boolean touchClassNode = !inTheClass && ast.is(NodeKind.CLASS);
+        buffer.append("\t");
+        buffer.append("struct");
+        buffer.append(myId);
+        buffer.append(" [label=\"");
+        buffer.append(ast.getId());
+        buffer.append("(");
+        buffer.append(level);
+        buffer.append(")");
 
-        if (touchClassNode) {
-            inTheClass = true;
-        } else if (inTheClass) {
+        final String stringVal = ast.getStringValue();
+        if (stringVal != null && !stringVal.equals("")) {
+            buffer.append("\\n");
+            buffer.append(EscapeEntities(stringVal));
+        }
 
-            buffer.append("\t");
-            buffer.append("struct");
+        buffer.append("\"];\n");
+
+        if (0 != parentStructId) {
+            buffer.append("\tstruct");
+            buffer.append(parentStructId);
+            buffer.append(" -> struct");
             buffer.append(myId);
-            buffer.append(" [label=\"");
-            buffer.append(ast.getId());
-            buffer.append("(");
-            buffer.append(level);
-            buffer.append(")");
-
-            final String stringVal = ast.getStringValue();
-            if (stringVal != null && !stringVal.equals("")) {
-                buffer.append("\\n");
-                buffer.append(EscapeEntities(stringVal));
-            }
-
-            buffer.append("\"];\n");
-
-            if (0 != parentStructId) {
-                buffer.append("\tstruct");
-                buffer.append(parentStructId);
-                buffer.append(" -> struct");
-                buffer.append(myId);
-                buffer.append(";\n");
-            }
-
+            buffer.append(";\n");
         }
 
-        if (level < 777) {
-            final int numChildren = ast.numChildren();
-            if (numChildren > 0) {
-                for (int i = 0; i<numChildren; i++) {
-                    VisitNode(ast.getChild(i), buffer, level + 1, myId);
-                }
+        final int numChildren = ast.numChildren();
+        if (numChildren > 0) {
+            for (int i = 0; i<numChildren; i++) {
+                VisitNode(ast.getChild(i), buffer, level + 1, myId);
             }
-        }
-
-        if (touchClassNode) {
-            inTheClass = false;
         }
     }
 
