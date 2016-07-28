@@ -56,7 +56,7 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
         VisitNode(ast, buffer, level, 0);
     }
     
-    protected String EscapeEntities( final String stringToEscape )
+    protected static String EscapeEntities( final String stringToEscape )
     {
         final StringBuffer buffer = new StringBuffer();
 

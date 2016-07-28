@@ -95,7 +95,7 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
     	clzMeta.methods.add(mthMeta);
     	
     	try {
-    		System.out.println(clzMeta.getName());
+    		System.out.println(EscapeEntities(clzMeta.getName()));
     	} catch (NoSuchFieldException ex) {
     		System.err.println(ex);
     	}
