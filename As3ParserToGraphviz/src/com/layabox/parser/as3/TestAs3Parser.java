@@ -50,9 +50,11 @@ public class TestAs3Parser {
     }
 
     private static int currentStructId;
+    private static Boolean inTheClass;
 
     private static void BeginVisit(final StringBuffer buffer) {
         currentStructId = 0;
+        inTheClass = false;
 
         buffer.setLength(0);
         buffer.append("digraph structs {\n");
@@ -79,30 +81,38 @@ public class TestAs3Parser {
         currentStructId++;
 
         final int myId = currentStructId;
+        
+        final Boolean touchClassNode = !inTheClass && ast.is(NodeKind.CLASS);
+        
+        if (touchClassNode) {
+        	inTheClass = true;
+        } else if (inTheClass) {
 
-        buffer.append("\t");
-        buffer.append("struct");
-        buffer.append(myId);
-        buffer.append(" [label=\"");
-        buffer.append(ast.getId());
-        buffer.append("(");
-        buffer.append(level);
-        buffer.append(")");
-
-        final String stringVal = ast.getStringValue();
-        if (stringVal != null && !stringVal.equals("")) {
-            buffer.append("\\n");
-            buffer.append(EscapeEntities(stringVal));
-        }
-
-        buffer.append("\"];\n");
-
-        if (0 != parentStructId) {
-            buffer.append("\tstruct");
-            buffer.append(parentStructId);
-            buffer.append(" -> struct");
+            buffer.append("\t");
+            buffer.append("struct");
             buffer.append(myId);
-            buffer.append(";\n");
+            buffer.append(" [label=\"");
+            buffer.append(ast.getId());
+            buffer.append("(");
+            buffer.append(level);
+            buffer.append(")");
+
+            final String stringVal = ast.getStringValue();
+            if (stringVal != null && !stringVal.equals("")) {
+                buffer.append("\\n");
+                buffer.append(EscapeEntities(stringVal));
+            }
+
+            buffer.append("\"];\n");
+
+            if (0 != parentStructId) {
+                buffer.append("\tstruct");
+                buffer.append(parentStructId);
+                buffer.append(" -> struct");
+                buffer.append(myId);
+                buffer.append(";\n");
+            }
+            
         }
 
         if (level < 777) {
@@ -112,6 +122,10 @@ public class TestAs3Parser {
                     VisitNode(ast.getChild(i), buffer, level + 1, myId);
                 }
             }
+        }
+        
+        if (touchClassNode) {
+        	inTheClass = false;
         }
     }
 
