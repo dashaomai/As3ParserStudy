@@ -95,7 +95,11 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
     	clzMeta.methods.add(mthMeta);
     	
     	try {
+    		System.out.println("digraph Clz {");
+    		System.out.println("\tnode [shape=\"record\",fontname=\"Courier New\",fontsize=9];");
+    		System.out.print('\t');
     		System.out.println(EscapeEntities(clzMeta.getName()));
+    		System.out.println("}");
     	} catch (NoSuchFieldException ex) {
     		System.err.println(ex);
     	}
