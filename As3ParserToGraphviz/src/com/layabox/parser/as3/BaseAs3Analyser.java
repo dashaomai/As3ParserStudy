@@ -138,7 +138,7 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 
 
     protected static void setupVariableList(final VariableMeta varMeta, final IParserNode ast) {
-      if (!ast.is(NodeKind.VAR_LIST)) {
+      if (!ast.is(NodeKind.VAR_LIST) && !ast.is(NodeKind.CONST_LIST)) {
         return;
       }
 

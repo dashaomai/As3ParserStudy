@@ -35,6 +35,8 @@ package
 	
 	public final class JPEGEncoder
 	{
+		private const ZigZag:Vector.<int>;
+		
 		// Static table initialization
 		private var YTable:Vector.<int> = new Vector.<int>(64, true);
 		private var UVTable:Vector.<int> = new Vector.<int>(64, true);

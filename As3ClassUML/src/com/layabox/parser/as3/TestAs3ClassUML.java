@@ -195,7 +195,7 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
 
           clzMeta = openClazzes.get(openClazzes.size() - 1);
 
-          if (ast.is(NodeKind.VAR_LIST)) {
+          if (ast.is(NodeKind.VAR_LIST) || ast.is(NodeKind.CONST_LIST)) {
             VariableMeta varMeta = new VariableMeta();
 
             setupVariableList(varMeta, ast);
