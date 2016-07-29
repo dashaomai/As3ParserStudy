@@ -5,9 +5,10 @@ package com.layabox.parser.as3.vo;
  * @author Bob Jiang
  *
  */
-public class VariableMeta {
+public class VariableMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier;
+	public Boolean isFinal;
 	public TypeMeta type;
 	
 	public VariableMeta() {
@@ -40,5 +41,25 @@ public class VariableMeta {
 		}
 		
 		return name + ": " + type.getName();
+	}
+
+	@Override
+	public EAccessSpecifier getAccessSpecifier() {
+		return accessSpecifier;
+	}
+
+	@Override
+	public void setAccessSpecifier(EAccessSpecifier value) {
+		accessSpecifier = value;
+	}
+
+	@Override
+	public Boolean getIsFinal() {
+		return isFinal;
+	}
+
+	@Override
+	public void setIsFinal(Boolean value) {
+		isFinal = value;
 	}
 }

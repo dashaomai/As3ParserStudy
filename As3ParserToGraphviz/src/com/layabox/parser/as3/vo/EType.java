@@ -14,7 +14,7 @@ public enum EType {
 	UINT("uint"),
 	BOOLEAN("Boolean"),
 	NULL("Null"),
-	
+
 	// 复合类型 Complex Value
 	OBJECT("Object"),
 	ARRAY("Array"),
@@ -24,19 +24,20 @@ public enum EType {
 	REGEXP("RegExp"),
 	XML("XML"),
 	XMLLIST("XMLList"),
-	
+  CLASS("Class"),
+
 	// 未列出的类型
 	VECTOR("Vector"),
-	
+
 	// 特殊的类型
 	OTHER("Other");
-	
+
 	private String name;
-	
+
 	private EType(final String nameToSet) {
 		name = nameToSet;
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;

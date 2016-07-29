@@ -7,7 +7,7 @@ public class TestAs3Analyser extends BaseAs3Analyser {
 
 	public static void main(String[] args) {
 		IAs3Analyser parser = new TestAs3Analyser();
-        parser.Process(args, "test/examples/JPEGEncoder.as");
+        parser.Process(args, "test/examples/JPEGEncoder3.as");
 	}
 
     private int currentStructId;
@@ -30,15 +30,15 @@ public class TestAs3Analyser extends BaseAs3Analyser {
     protected void VisitNode(final IParserNode ast, final StringBuffer buffer, final int level, final int parentStructId) {
 
         if (
-                ast.is(NodeKind.BLOCK) ||
+                ast.is(NodeKind.BLOCK) /*||
                         ast.is(NodeKind.META_LIST) ||
-                        ast.is(NodeKind.INIT)
+                        ast.is(NodeKind.INIT)*/
                 )
             return;
 
         currentStructId++;
 
-    final int myId = currentStructId;
+        final int myId = currentStructId;
 
         buffer.append("\t");
         buffer.append("struct");

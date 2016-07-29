@@ -8,9 +8,10 @@ import java.util.List;
  * @author Bob Jiang
  *
  */
-public class MethodMeta {
+public class MethodMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier;
+	public Boolean isFinal;
 	public TypeMeta type;
 	
 	public List<VariableMeta> parameters;
@@ -18,6 +19,7 @@ public class MethodMeta {
 	public MethodMeta() {
 		name = null;
 		accessSpecifier = null;
+		isFinal = false;
 		type = null;
 		parameters = new ArrayList<VariableMeta>();
 	}
@@ -56,5 +58,25 @@ public class MethodMeta {
 		buffer.append(type.getName());
 		
 		return buffer.toString();
+	}
+
+	@Override
+	public EAccessSpecifier getAccessSpecifier() {
+		return accessSpecifier;
+	}
+
+	@Override
+	public void setAccessSpecifier(EAccessSpecifier value) {
+		accessSpecifier = value;
+	}
+
+	@Override
+	public Boolean getIsFinal() {
+		return isFinal;
+	}
+
+	@Override
+	public void setIsFinal(Boolean value) {
+		isFinal = value;
 	}
 }

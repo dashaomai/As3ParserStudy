@@ -8,7 +8,7 @@ import java.util.List;
  * @author Bob Jiang
  *
  */
-public class ClassMeta {
+public class ClassMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier;				// 访问控制符
 	public Boolean isFinal;
@@ -18,7 +18,7 @@ public class ClassMeta {
 	
 	public ClassMeta() {
 		name = null;
-		accessSpecifier = null;
+		accessSpecifier = EAccessSpecifier.PUBLIC;
 		isFinal = false;
 		
 		variables = new ArrayList<VariableMeta>();
@@ -69,5 +69,25 @@ public class ClassMeta {
 		buffer.append("}\" ];");
 		
 		return buffer.toString();
+	}
+
+	@Override
+	public EAccessSpecifier getAccessSpecifier() {
+		return accessSpecifier;
+	}
+
+	@Override
+	public void setAccessSpecifier(EAccessSpecifier value) {
+		accessSpecifier = value;
+	}
+
+	@Override
+	public Boolean getIsFinal() {
+		return isFinal;
+	}
+
+	@Override
+	public void setIsFinal(Boolean value) {
+		isFinal = value;
 	}
 }
