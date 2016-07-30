@@ -17,10 +17,12 @@ import com.layabox.parser.as3.vo.VariableMeta;
  */
 public class TestAs3ClassUML extends BaseAs3Analyser {
 	public static void main(String[] args) {
-		testVo();
+		// testVo();
 
 		IAs3Analyser parser = new TestAs3ClassUML();
-		parser.Process(args, "test/examples/JPEGEncoder3.as");
+		parser.Process(args, "test/examples/Enum.as");
+		parser.Process(args, "test/examples/FisheyeBase.as");
+		parser.Process(args, "test/examples/FlexPMD195.as");
 	}
 
 	private static void testVo() {
@@ -138,6 +140,8 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
 			}
 		} catch (NoSuchFieldException ex) {
 			System.err.println(ex);
+		} catch (NullPointerException ex) {
+			System.err.println(ex);
 		}
 
 		buffer.append("}");
@@ -196,6 +200,12 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
 				setupVariableList(varMeta, ast);
 
 				clzMeta.variables.add(varMeta);
+			} else if (ast.is(NodeKind.FUNCTION)) {
+				MethodMeta mthMeta = new MethodMeta();
+				
+				setupFunction(mthMeta, ast);
+				
+				clzMeta.methods.add(mthMeta);
 			}
 		}
 
@@ -204,7 +214,11 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
 		} else if (0 == openClazzes.size()) {
 			// 进入类以前的太初节点，需要遍历子节点
 			for (int i = 0, m = ast.numChildren(); i < m; i++) {
+				try {
 				VisitNode(ast.getChild(i), buffer, level + 1, myId);
+				} catch (Exception ex) {
+					System.err.println(ex);
+				}
 			}
 		}
 	}

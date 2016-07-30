@@ -25,11 +25,11 @@ public class TypeMeta {
 
 			return "Vector.<" + vectorType.getName() + ">";
 		} else if (type.equals(EType.OTHER)) {
-			if (null == otherName || otherName.equals("")) {
+			if (null == otherName) {
 				throw new NoSuchFieldException("Other 类型没有指定正确的 otherName");
 			}
 
-			return otherName;
+			return otherName.equals("") ? "void" : otherName;
 		}
 
 		return type.toString();

@@ -11,6 +11,7 @@ import com.layabox.parser.as3.vo.ClassMeta;
 import com.layabox.parser.as3.vo.EAccessSpecifier;
 import com.layabox.parser.as3.vo.EType;
 import com.layabox.parser.as3.vo.IModifier;
+import com.layabox.parser.as3.vo.MethodMeta;
 import com.layabox.parser.as3.vo.TypeMeta;
 import com.layabox.parser.as3.vo.VariableMeta;
 
@@ -151,6 +152,54 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 			}
 		}
 	}
+	
+	protected static void setupParameterList(final MethodMeta mthMeta, final IParserNode ast) {
+		if (!ast.is(NodeKind.PARAMETER_LIST) || 0 == ast.numChildren())
+			return;
+		
+		for (final IParserNode subAst : ast.getChildren()) {
+			if (subAst.is(NodeKind.PARAMETER)) {
+				for (final IParserNode subAst2 : subAst.getChildren()) {
+					if (subAst2.is(NodeKind.NAME_TYPE_INIT)) {
+						VariableMeta varMeta = new VariableMeta();
+						
+						setupNameTypeInit(varMeta, subAst2);
+						
+						mthMeta.parameters.add(varMeta);
+					}
+				}
+			}
+		}
+	}
+	
+	protected static void setupFunction(final MethodMeta mthMeta, final IParserNode ast) {
+		if (!ast.is(NodeKind.FUNCTION))
+			return;
+		
+		for (int i = 0, m = ast.numChildren(); i<m; i++) {
+			IParserNode subAst = ast.getChild(i);
+			
+			if (subAst.is(NodeKind.MOD_LIST)) {
+				setupModifierList(mthMeta, subAst);
+			} else if (subAst.is(NodeKind.PARAMETER_LIST)) {
+				setupParameterList(mthMeta, subAst);
+			} else if (subAst.is(NodeKind.NAME)) {
+				mthMeta.name = subAst.getStringValue();
+			} else if (subAst.is(NodeKind.TYPE)) {
+				TypeMeta typMeta = new TypeMeta();
+				
+				setupType(typMeta, subAst);
+				
+				mthMeta.type = typMeta;
+			} else if (subAst.is(NodeKind.VECTOR)) {
+				TypeMeta typMeta = new TypeMeta();
+				
+				setupVector(typMeta, subAst);
+				
+				mthMeta.type = typMeta;
+			}
+		}
+	}
 
 	protected static void setupNameTypeInit(final VariableMeta varMeta, final IParserNode ast) {
 		if (!ast.is(NodeKind.NAME_TYPE_INIT))
@@ -164,25 +213,34 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 			} else if (subAst.is(NodeKind.TYPE)) {
 				setupType(varMeta, subAst);
 			} else if (subAst.is(NodeKind.VECTOR)) {
-				// Vector 类型，只有一个子节点
-				varMeta.type = new TypeMeta();
-				varMeta.type.type = EType.VECTOR;
-
-				IParserNode subAst2 = subAst.getChild(0);
-				TypeMeta subVarMeta = new TypeMeta();
-				varMeta.type.vectorType = subVarMeta;
-
-				while (subAst2.is(NodeKind.VECTOR)) {
-					subVarMeta.type = EType.VECTOR;
-					subVarMeta.vectorType = new TypeMeta();
-					subVarMeta = subVarMeta.vectorType;
-
-					subAst2 = subAst2.getChild(0);
-				}
-
-				setupType(subVarMeta, subAst2);
+				setupVector(varMeta, subAst);
 			}
 		}
+	}
+
+	protected static void setupVector(final VariableMeta varMeta, final IParserNode ast) {
+		// Vector 类型，只有一个子节点
+		varMeta.type = new TypeMeta();
+		
+		setupVector(varMeta.type, ast);
+	}
+	
+	protected static void setupVector(final TypeMeta typMeta, final IParserNode ast) {
+		typMeta.type = EType.VECTOR;
+
+		IParserNode subAst = ast.getChild(0);
+		TypeMeta subVarMeta = new TypeMeta();
+		typMeta.vectorType = subVarMeta;
+
+		while (subAst.is(NodeKind.VECTOR)) {
+			subVarMeta.type = EType.VECTOR;
+			subVarMeta.vectorType = new TypeMeta();
+			subVarMeta = subVarMeta.vectorType;
+
+			subAst = subAst.getChild(0);
+		}
+
+		setupType(subVarMeta, subAst);
 	}
 
 	protected static void setupType(final VariableMeta varMeta, final IParserNode ast) {

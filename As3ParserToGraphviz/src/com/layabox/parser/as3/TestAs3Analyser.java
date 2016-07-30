@@ -7,7 +7,7 @@ public class TestAs3Analyser extends BaseAs3Analyser {
 
 	public static void main(String[] args) {
 		IAs3Analyser parser = new TestAs3Analyser();
-		parser.Process(args, "test/examples/JPEGEncoder3.as");
+		parser.Process(args, "test/examples/Enum.as");
 	}
 
 	private int currentStructId;
