@@ -22,177 +22,170 @@ import de.bokelberg.flex.parser.AS3Parser;
 public abstract class BaseAs3Analyser implements IAs3Analyser {
 
 	@Override
-    public void Process(final String[] args, final String defaultPath) {
-        String filePath = null;
+	public void Process(final String[] args, final String defaultPath) {
+		String filePath = null;
 
-        if (args.length > 0) {
-            filePath = args[0];
-        } else {
-            try {
-                filePath = ClassLoader.getSystemResource(defaultPath).toURI().getPath();
-            } catch (URISyntaxException ex) {
-                System.err.println(ex);
-                return;
-            }
-        }
+		if (args.length > 0) {
+			filePath = args[0];
+		} else {
+			try {
+				filePath = ClassLoader.getSystemResource(defaultPath).toURI().getPath();
+			} catch (URISyntaxException ex) {
+				System.err.println(ex);
+				return;
+			}
+		}
 
-        if (null != filePath) {
-            try {
-                Parse(filePath);
-            } catch (Exception ex) {
-                System.err.println(ex);
-            }
-        }
-    }
+		if (null != filePath) {
+			try {
+				Parse(filePath);
+			} catch (Exception ex) {
+				System.err.println(ex);
+			}
+		}
+	}
 
 	@Override
-    public void Parse(final String filePath) throws URISyntaxException, IOException, TokenException {
-        IAS3Parser parser = new AS3Parser();
+	public void Parse(final String filePath) throws URISyntaxException, IOException, TokenException {
+		IAS3Parser parser = new AS3Parser();
 
-        IParserNode root = parser.buildAst(filePath);
-        StringBuffer buffer = new StringBuffer();
+		IParserNode root = parser.buildAst(filePath);
+		StringBuffer buffer = new StringBuffer();
 
-        BeginVisit(buffer);
-        VisitNode(root, buffer, 1);
-        EndVisit(buffer);
+		BeginVisit(buffer);
+		VisitNode(root, buffer, 1);
+		EndVisit(buffer);
 
-        System.out.println(buffer);
-    }
+		System.out.println(buffer);
+	}
 
-    protected abstract void VisitNode(final IParserNode ast, final StringBuffer buffer, final int level, final int parentStructId);
+	protected abstract void VisitNode(final IParserNode ast, final StringBuffer buffer, final int level,
+			final int parentStructId);
 
-    public void VisitNode(final IParserNode ast, final StringBuffer buffer, final int level) {
-        VisitNode(ast, buffer, level, 0);
-    }
+	public void VisitNode(final IParserNode ast, final StringBuffer buffer, final int level) {
+		VisitNode(ast, buffer, level, 0);
+	}
 
-    protected static String EscapeEntities( final String stringToEscape )
-    {
-        final StringBuffer buffer = new StringBuffer();
+	protected static String EscapeEntities(final String stringToEscape) {
+		final StringBuffer buffer = new StringBuffer();
 
-        for ( int i = 0; i < stringToEscape.length(); i++ )
-        {
-            final char currentCharacter = stringToEscape.charAt( i );
+		for (int i = 0; i < stringToEscape.length(); i++) {
+			final char currentCharacter = stringToEscape.charAt(i);
 
-            if ( currentCharacter == '<' )
-            {
-                buffer.append( "&lt;" );
-            }
-            else if ( currentCharacter == '>' )
-            {
-                buffer.append( "&gt;" );
-            }
-            else
-            {
-                buffer.append( currentCharacter );
-            }
-        }
-        return buffer.toString();
-    }
+			if (currentCharacter == '<') {
+				buffer.append("&lt;");
+			} else if (currentCharacter == '>') {
+				buffer.append("&gt;");
+			} else {
+				buffer.append(currentCharacter);
+			}
+		}
+		return buffer.toString();
+	}
 
+	protected void setupClassMetaByParserNode(final ClassMeta clzMeta, final IParserNode ast, final StringBuffer buffer,
+			final int level, final int myId) {
+		if (!ast.is(NodeKind.CLASS))
+			return;
 
-    protected void setupClassMetaByParserNode(final ClassMeta clzMeta, final IParserNode ast, final StringBuffer buffer, final int level, final int myId) {
-      if (!ast.is(NodeKind.CLASS))
-        return;
+		for (int i = 0, m = ast.numChildren(); i < m; i++) {
+			IParserNode subAst = ast.getChild(i);
 
-      for (int i = 0, m = ast.numChildren(); i<m; i++) {
-        IParserNode subAst = ast.getChild(i);
+			if (subAst.is(NodeKind.NAME)) {
+				clzMeta.name = subAst.getStringValue();
+			} else if (subAst.is(NodeKind.MOD_LIST)) {
+				setupModifierList(clzMeta, ast);
+			} else if (subAst.is(NodeKind.CONTENT)) {
+				for (int j = 0, n = subAst.numChildren(); j < n; j++) {
+					VisitNode(subAst.getChild(j), buffer, level + 1, myId);
+				}
+			}
+		}
+	}
 
-        if (subAst.is(NodeKind.NAME)) {
-          clzMeta.name = subAst.getStringValue();
-        } else if (subAst.is(NodeKind.MOD_LIST)) {
-          setupModifierList(clzMeta, ast);
-        } else if (subAst.is(NodeKind.CONTENT)) {
-          for (int j = 0, n = subAst.numChildren(); j<n; j++) {
-            VisitNode(subAst.getChild(j), buffer, level + 1, myId);
-          }
-        }
-      }
-    }
+	protected static void setupModifierList(final IModifier modListMeta, final IParserNode ast) {
+		if (!ast.is(NodeKind.MOD_LIST))
+			return;
 
-    protected static void setupModifierList(final IModifier modListMeta, final IParserNode ast) {
-      if (!ast.is(NodeKind.MOD_LIST))
-        return;
+		for (int i = 0, m = ast.numChildren(); i < m; i++) {
+			IParserNode subAst = ast.getChild(i);
 
-      for (int i = 0, m = ast.numChildren(); i<m; i++) {
-        IParserNode subAst = ast.getChild(i);
+			if (subAst.is(NodeKind.MODIFIER)) {
+				final String strVal = subAst.getStringValue();
 
-        if (subAst.is(NodeKind.MODIFIER)) {
-          final String strVal = subAst.getStringValue();
+				if (null == strVal) {
+					continue;
+				} else if (strVal.equals("public")) {
+					modListMeta.setAccessSpecifier(EAccessSpecifier.PUBLIC);
+				} else if (strVal.equals("protected")) {
+					modListMeta.setAccessSpecifier(EAccessSpecifier.PROTECTED);
+				} else if (strVal.equals("private")) {
+					modListMeta.setAccessSpecifier(EAccessSpecifier.PRIVATE);
+				} else if (strVal.equals("internal")) {
+					modListMeta.setAccessSpecifier(EAccessSpecifier.INTERNAL);
+				} else if (strVal.equals("final")) {
+					modListMeta.setIsFinal(true);
+				}
+			}
+		}
+	}
 
-          if (null == strVal) {
-            continue;
-          } else if (strVal.equals("public")) {
-            modListMeta.setAccessSpecifier(EAccessSpecifier.PUBLIC);
-          } else if (strVal.equals("protected")) {
-            modListMeta.setAccessSpecifier(EAccessSpecifier.PROTECTED);
-          } else if (strVal.equals("private")) {
-            modListMeta.setAccessSpecifier(EAccessSpecifier.PRIVATE);
-          } else if (strVal.equals("internal")) {
-        	  modListMeta.setAccessSpecifier(EAccessSpecifier.INTERNAL);
-          } else if (strVal.equals("final")) {
-            modListMeta.setIsFinal(true);
-          }
-        }
-      }
-    }
+	protected static void setupVariableList(final VariableMeta varMeta, final IParserNode ast) {
+		if (!ast.is(NodeKind.VAR_LIST) && !ast.is(NodeKind.CONST_LIST)) {
+			return;
+		}
 
+		for (int i = 0, m = ast.numChildren(); i < m; i++) {
+			IParserNode subAst = ast.getChild(i);
 
-    protected static void setupVariableList(final VariableMeta varMeta, final IParserNode ast) {
-      if (!ast.is(NodeKind.VAR_LIST) && !ast.is(NodeKind.CONST_LIST)) {
-        return;
-      }
+			if (subAst.is(NodeKind.MOD_LIST)) {
+				setupModifierList(varMeta, subAst);
+			} else if (subAst.is(NodeKind.NAME_TYPE_INIT)) {
+				setupNameTypeInit(varMeta, subAst);
+			}
+		}
+	}
 
-      for (int i = 0, m = ast.numChildren(); i<m; i++) {
-        IParserNode subAst = ast.getChild(i);
+	protected static void setupNameTypeInit(final VariableMeta varMeta, final IParserNode ast) {
+		if (!ast.is(NodeKind.NAME_TYPE_INIT))
+			return;
 
-        if (subAst.is(NodeKind.MOD_LIST)) {
-          setupModifierList(varMeta, subAst);
-        } else if (subAst.is(NodeKind.NAME_TYPE_INIT)) {
-          setupNameTypeInit(varMeta, subAst);
-        }
-      }
-    }
+		for (int i = 0, m = ast.numChildren(); i < m; i++) {
+			IParserNode subAst = ast.getChild(i);
 
-    protected static void setupNameTypeInit(final VariableMeta varMeta, final IParserNode ast) {
-      if (!ast.is(NodeKind.NAME_TYPE_INIT))
-        return;
+			if (subAst.is(NodeKind.NAME)) {
+				varMeta.name = subAst.getStringValue();
+			} else if (subAst.is(NodeKind.TYPE)) {
+				setupType(varMeta, subAst);
+			} else if (subAst.is(NodeKind.VECTOR)) {
+				// Vector 类型，只有一个子节点
+				varMeta.type = new TypeMeta();
+				varMeta.type.type = EType.VECTOR;
 
-      for (int i = 0, m = ast.numChildren(); i<m; i++) {
-        IParserNode subAst = ast.getChild(i);
+				IParserNode subAst2 = subAst.getChild(0);
+				TypeMeta subVarMeta = new TypeMeta();
+				varMeta.type.vectorType = subVarMeta;
 
-        if (subAst.is(NodeKind.NAME)) {
-          varMeta.name = subAst.getStringValue();
-        } else if (subAst.is(NodeKind.TYPE)) {
-          setupType(varMeta, subAst);
-        } else if (subAst.is(NodeKind.VECTOR)) {
-          // Vector 类型，只有一个子节点
-          varMeta.type = new TypeMeta();
-          varMeta.type.type = EType.VECTOR;
+				while (subAst2.is(NodeKind.VECTOR)) {
+					subVarMeta.type = EType.VECTOR;
+					subVarMeta.vectorType = new TypeMeta();
+					subVarMeta = subVarMeta.vectorType;
 
-          IParserNode subAst2 = subAst.getChild(0);
-          TypeMeta subVarMeta = new TypeMeta();
-          varMeta.type.vectorType = subVarMeta;
+					subAst2 = subAst2.getChild(0);
+				}
 
-          while (subAst2.is(NodeKind.VECTOR)) {
-            subVarMeta.type = EType.VECTOR;
-            subVarMeta.vectorType = new TypeMeta();
-            subVarMeta = subVarMeta.vectorType;
+				setupType(subVarMeta, subAst2);
+			}
+		}
+	}
 
-            subAst2 = subAst2.getChild(0);
-          }
+	protected static void setupType(final VariableMeta varMeta, final IParserNode ast) {
+		varMeta.type = new TypeMeta();
+		setupType(varMeta.type, ast);
+	}
 
-          setupType(subVarMeta, subAst2);
-        }
-      }
-    }
-    
-    protected static void setupType(final VariableMeta varMeta, final IParserNode ast) {
-        varMeta.type = new TypeMeta();
-        setupType(varMeta.type, ast);
-    }
-    
-    protected static void setupType(final TypeMeta typMeta, final IParserNode ast) {
-    	final String strVal = ast.getStringValue();
+	protected static void setupType(final TypeMeta typMeta, final IParserNode ast) {
+		final String strVal = ast.getStringValue();
 
 		if (null == strVal) {
 			return;
@@ -234,5 +227,5 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 			typMeta.type = EType.OTHER;
 			typMeta.otherName = strVal;
 		}
-    }
+	}
 }
