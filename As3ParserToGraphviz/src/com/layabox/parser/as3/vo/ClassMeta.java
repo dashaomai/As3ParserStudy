@@ -13,17 +13,23 @@ public class ClassMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier; // 访问控制符
 	public Boolean isFinal;
+	
+	public String parentClassName;					// 扩展的父类名称
 
 	public List<VariableMeta> variables;
 	public List<MethodMeta> methods;
+	public List<String> interfaces;					// 实现的接口
 
 	public ClassMeta() {
 		name = null;
 		accessSpecifier = EAccessSpecifier.PUBLIC;
 		isFinal = false;
+		
+		parentClassName = null;
 
 		variables = new ArrayList<VariableMeta>();
 		methods = new ArrayList<MethodMeta>();
+		interfaces = new ArrayList<String>();
 	}
 
 	public String getName() throws NoSuchFieldException {
@@ -36,6 +42,22 @@ public class ClassMeta implements IModifier {
 		buffer.append(name);
 		buffer.append(" [ label = \"{");
 		buffer.append(name);
+		
+		if (null != parentClassName) {
+			buffer.append(" extends ");
+			buffer.append(parentClassName);
+		}
+		
+		if (0 < interfaces.size()) {
+			buffer.append(" implements ");
+			for (int i = 0, m = interfaces.size(); i<m; i++) {
+				buffer.append(interfaces.get(i));
+				
+				if (i < m - 1) {
+					buffer.append(", ");
+				}
+			}
+		}
 
 		if (variables.size() > 0) {
 			buffer.append('|');

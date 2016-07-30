@@ -21,8 +21,6 @@ public class TestAs3ClassUML extends BaseAs3Analyser {
 
 		IAs3Analyser parser = new TestAs3ClassUML();
 		parser.Process(args, "test/examples/Enum.as");
-		parser.Process(args, "test/examples/FisheyeBase.as");
-		parser.Process(args, "test/examples/FlexPMD195.as");
 	}
 
 	private static void testVo() {

@@ -100,6 +100,14 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 				for (int j = 0, n = subAst.numChildren(); j < n; j++) {
 					VisitNode(subAst.getChild(j), buffer, level + 1, myId);
 				}
+			} else if (subAst.is(NodeKind.EXTENDS)) {
+				clzMeta.parentClassName = subAst.getStringValue();
+			} else if (subAst.is(NodeKind.IMPLEMENTS_LIST)) {
+				for (final IParserNode subAst2 : subAst.getChildren()) {
+					if (subAst2.is(NodeKind.IMPLEMENTS)) {
+						clzMeta.interfaces.add(subAst2.getStringValue());
+					}
+				}
 			}
 		}
 	}
