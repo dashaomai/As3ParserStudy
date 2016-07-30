@@ -91,4 +91,24 @@ public class ClassMeta implements IModifier {
 	public void setIsFinal(Boolean value) {
 		isFinal = value;
 	}
+
+	@Override
+	public Boolean getIsStatic() {
+		return false;
+	}
+
+	@Override
+	public void setIsStatic(Boolean value) {
+		// do nothing;
+	}
+
+	@Override
+	public Boolean getIsOverride() {
+		return false;
+	}
+
+	@Override
+	public void setIsOverride(Boolean value) {
+		// do nothing
+	}
 }

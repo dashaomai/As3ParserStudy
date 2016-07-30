@@ -12,7 +12,9 @@ import java.util.List;
 public class MethodMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier;
+	public Boolean isStatic;
 	public Boolean isFinal;
+	public Boolean isOverride;
 	public TypeMeta type;
 
 	public List<VariableMeta> parameters;
@@ -20,7 +22,9 @@ public class MethodMeta implements IModifier {
 	public MethodMeta() {
 		name = null;
 		accessSpecifier = null;
+		isStatic = false;
 		isFinal = false;
+		isOverride = false;
 		type = null;
 		parameters = new ArrayList<VariableMeta>();
 	}
@@ -57,6 +61,9 @@ public class MethodMeta implements IModifier {
 
 		buffer.append("): ");
 		buffer.append(type.getName());
+		
+		if (isStatic)
+			buffer.append(" [Static]");
 
 		return buffer.toString();
 	}
@@ -79,5 +86,25 @@ public class MethodMeta implements IModifier {
 	@Override
 	public void setIsFinal(Boolean value) {
 		isFinal = value;
+	}
+
+	@Override
+	public Boolean getIsStatic() {
+		return isStatic;
+	}
+
+	@Override
+	public void setIsStatic(Boolean value) {
+		isStatic = value;
+	}
+
+	@Override
+	public Boolean getIsOverride() {
+		return isOverride;
+	}
+
+	@Override
+	public void setIsOverride(Boolean value) {
+		isOverride = value;
 	}
 }

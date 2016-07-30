@@ -35,14 +35,14 @@ package
 	
 	public final class JPEGEncoder
 	{
-		private const ZigZag:Vector.<int>;
+		private static const ZigZag:Vector.<int>;
 		
 		// Static table initialization
 		private var YTable:Vector.<int> = new Vector.<int>(64, true);
-		private var UVTable:Vector.<int> = new Vector.<int>(64, true);
+		private static var UVTable:Vector.<int> = new Vector.<int>(64, true);
 		private var sf:int;
 		
-		private function initQuantTables(sf:int):void
+		override private function initQuantTables(sf:int):void
 		{
 			var i:int;
 			const I64:int = 64;

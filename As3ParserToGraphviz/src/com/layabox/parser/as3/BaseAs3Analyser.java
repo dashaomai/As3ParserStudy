@@ -125,16 +125,22 @@ public abstract class BaseAs3Analyser implements IAs3Analyser {
 					modListMeta.setAccessSpecifier(EAccessSpecifier.INTERNAL);
 				} else if (strVal.equals("final")) {
 					modListMeta.setIsFinal(true);
+				} else if (strVal.equals("static")) {
+					modListMeta.setIsStatic(true);
+				} else if (strVal.equals("override")) {
+					modListMeta.setIsOverride(true);
 				}
 			}
 		}
 	}
 
 	protected static void setupVariableList(final VariableMeta varMeta, final IParserNode ast) {
-		if (!ast.is(NodeKind.VAR_LIST) && !ast.is(NodeKind.CONST_LIST)) {
+		varMeta.isConst = ast.is(NodeKind.CONST_LIST);
+		
+		if (!varMeta.isConst && !ast.is(NodeKind.VAR_LIST)) {
 			return;
 		}
-
+		
 		for (int i = 0, m = ast.numChildren(); i < m; i++) {
 			IParserNode subAst = ast.getChild(i);
 

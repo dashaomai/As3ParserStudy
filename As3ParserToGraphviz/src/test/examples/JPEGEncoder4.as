@@ -36,12 +36,12 @@ package
 	public final class JPEGEncoder
 	{
 		// Static table initialization
-		private const ZigZag:Vector.<int>;
+		private static const ZigZag:Vector.<int>;
 		private var YTable:Vector.<int> = new Vector.<int>(64, true);
 		private var sf:int;
         final public var sb:uint;
         private var sc:Number;
-        private var sd:void;
+        private static var sd:void;
         private var se:String
         private var sg:Boolean;
         private var sh:Null;

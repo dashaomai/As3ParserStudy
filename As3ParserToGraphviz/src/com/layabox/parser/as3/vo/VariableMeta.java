@@ -9,12 +9,17 @@ package com.layabox.parser.as3.vo;
 public class VariableMeta implements IModifier {
 	public String name;
 	public EAccessSpecifier accessSpecifier;
+	public Boolean isStatic;
 	public Boolean isFinal;
+	public Boolean isConst;
 	public TypeMeta type;
 
 	public VariableMeta() {
 		name = null;
 		accessSpecifier = null;
+		isStatic = false;
+		isFinal = false;
+		isConst = false;
 		type = null;
 	}
 
@@ -30,8 +35,14 @@ public class VariableMeta implements IModifier {
 		} else {
 			buffer.append("- ");
 		}
-
+		
 		buffer.append(getTinyName());
+		
+		if (isConst)
+			buffer.append(" [Const]");
+		
+		if (isStatic)
+			buffer.append(" [Static]");
 
 		return buffer.toString();
 	}
@@ -62,5 +73,25 @@ public class VariableMeta implements IModifier {
 	@Override
 	public void setIsFinal(Boolean value) {
 		isFinal = value;
+	}
+
+	@Override
+	public Boolean getIsStatic() {
+		return isStatic;
+	}
+
+	@Override
+	public void setIsStatic(Boolean value) {
+		isStatic = value;
+	}
+
+	@Override
+	public Boolean getIsOverride() {
+		return false;
+	}
+
+	@Override
+	public void setIsOverride(Boolean value) {
+		// do nothing;
 	}
 }
