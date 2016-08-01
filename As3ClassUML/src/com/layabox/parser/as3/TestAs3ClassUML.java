@@ -17,7 +17,8 @@ import com.layabox.parser.as3.vo.VariableMeta;
  */
 public class TestAs3ClassUML extends BaseAs3Analyser {
 	public static void main(String[] args) {
-		// testVo();
+		if (args.length > 0)
+			testVo();
 
 		IAs3Analyser parser = new TestAs3ClassUML();
 		parser.Process(args, "test/examples/Enum.as");
